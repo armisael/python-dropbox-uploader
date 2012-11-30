@@ -18,7 +18,9 @@ class Uploader(object):
     """ Allow to upload files on dropbox by handling authentication
     and session for you.
     """
-    params = ['app_key', 'app_secret', 'access_type', 'access_token']
+    params = ['app_key', 'app_secret', 'access_type', 'access_token',
+              'max_failures']
+    max_failures = 10
 
     def __init__(self, **kwargs):
         config = kwargs.get('config', None)
@@ -89,20 +91,20 @@ class Uploader(object):
             uploader = dbclient.get_chunked_uploader(f, size)
             while uploader.offset < size:
                 try:
-                    upload = uploader.upload_chunked()
+                    uploader.upload_chunked()
                 except Exception, exc:
                     # perform error handling and retry logic
                     failures += 1
-                    if failures >= 10:
+                    if failures >= self.max_failures:
                         print "Failed after {0} attempts: {1}".format(
                             failures, exc
                         )
                         return False
                 else:
                     failures = 0
-            uploader.finish(out_dir + '/' + filename)
 
-        return True
+            uploader.finish(out_dir + '/' + filename)
+            return True
 
     def _load_config(self, an_obj, a_fun):
         for param in self.params:
