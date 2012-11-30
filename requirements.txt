@@ -3,3 +3,6 @@ dropbox==1.5.1
 requests==0.14.2
 lxml==3.0.1
 pyquery==1.2.2
+
+# to run the examples:
+clint2==0.3.2

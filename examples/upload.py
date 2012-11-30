@@ -2,12 +2,12 @@
 """ Upload a file specified by command line
 """
 
-import sys
+from clint import args
 from dropbox_uploader import Uploader
 
 uploader = Uploader(config='myconf')
 
-if '--authorize' in sys.argv:
+if '--authorize' in args:
     from getpass import getpass
 
     username = raw_input('username>>> ')
@@ -17,7 +17,7 @@ if '--authorize' in sys.argv:
           "to allow future calls: ('{0}', '{1}')".format(token.key, token.secret)
     exit(0)
 
-for fname in sys.argv[1:]:
+for fname in args.files:
     try:
         print "Uploading {0}...".format(fname),
         print "Done" if uploader.upload(fname) else "Failed"
