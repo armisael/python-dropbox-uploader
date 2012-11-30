@@ -1,6 +1,7 @@
 """ dropbox_uploader contains what you need to easily upload files
 on your dropbox directory
 """
+import os
 import requests
 
 from dropbox import client, session
@@ -80,9 +81,27 @@ class Uploader(object):
     def upload(self, filename, out_dir='/'):
         if not self.authenticate():
             return False
-        self.client = client.DropboxClient(self.session)
-        with open(filename) as f:
-            self.client.put_file(out_dir + '/' + filename, f)
+
+        dbclient = client.DropboxClient(self.session)
+        size = os.stat(filename).st_size
+        failures = 0
+        with open(filename, 'rb') as f:
+            uploader = dbclient.get_chunked_uploader(f, size)
+            while uploader.offset < size:
+                try:
+                    upload = uploader.upload_chunked()
+                except Exception, exc:
+                    # perform error handling and retry logic
+                    failures += 1
+                    if failures >= 10:
+                        print "Failed after {0} attempts: {1}".format(
+                            failures, exc
+                        )
+                        return False
+                else:
+                    failures = 0
+            uploader.finish(out_dir + '/' + filename)
+
         return True
 
     def _load_config(self, an_obj, a_fun):
