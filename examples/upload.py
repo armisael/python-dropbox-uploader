@@ -1,5 +1,7 @@
+#!/usr/bin/env python
 """ Upload a file specified by command line
 """
+
 import sys
 from dropbox_uploader import Uploader
 
@@ -15,7 +17,7 @@ if '--authorize' in sys.argv:
           "to allow future calls: ('{0}', '{1}')".format(token.key, token.secret)
     exit(0)
 
-for fname in sys.argv:
+for fname in sys.argv[1:]:
     try:
         print "Uploading {0}...".format(fname),
         print "Done" if uploader.upload(fname) else "Failed"
