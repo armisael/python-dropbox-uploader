@@ -4,6 +4,8 @@ on your dropbox directory
 import os
 import requests
 
+from os import path
+
 from dropbox import client, session
 from pyquery import PyQuery
 from urlparse import urlparse, urlunparse
@@ -103,7 +105,7 @@ class Uploader(object):
                 else:
                     failures = 0
 
-            uploader.finish(out_dir + '/' + filename)
+            uploader.finish(out_dir + '/' + path.basename(filename))
             return True
 
     def _load_config(self, an_obj, a_fun):
